@@ -1,0 +1,19 @@
+body {
+    width: 500px;
+    margin: 4% auto;
+    font-family: 'Source Sans Pro', sans-serif;
+    letter-spacing: 5px;
+    font-size: 1.8rem;
+    user-select: none;
+}
+.calculator_app {
+    padding: 20px;
+    box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 1px;
+}
+.input_field {
+    border: 1px solid #ddd;
+    border-radius: 1px;
+    height: 60px;
+    padding-right: 15px;
+}
