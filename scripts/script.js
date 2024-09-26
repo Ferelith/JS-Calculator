@@ -1,31 +1,48 @@
 "use strict";
+class Calculator {
+    constructor() {
+        this.number_buttons = document.querySelectorAll('.number_buttons div');
+        this.operator_buttons = document.querySelectorAll('.operator_buttons div');
+        this.input_field = document.getElementById('input_field');
 
-// Calculator App
-let number_buttons = document.querySelectorAll('.number_buttons div');
-let operator_buttons = document.querySelectorAll('.operator_buttons div');
-let input_field = document.getElementById('input_field');
+        this.current_input = [];
 
-let current_input = [];
+        this.addNumberListeners();
+        this.addOperatorListeners();
+    }
 
-for (let i = 0; i < number_buttons.length; i++) {
-    number_buttons[i].addEventListener('click', (e) => {
-        if(number_buttons[i].innerHTML == "C") {
-            input_field.innerHTML = "";
-            current_input = [];
-        } else {
-            current_input.push(number_buttons[i].innerHTML);
-            
-            for (let x = 0; x < current_input.length; x++) {
-                input_field.innerHTML = current_input.join('');
-            }
-        }  
-    });
+    addNumberListeners() {
+        for (let i = 0; i < this.number_buttons.length; i++) {
+            this.number_buttons[i].addEventListener('click', (e) => {
+                this.handleNumberClick(this.number_buttons[i].innerHTML);
+            });
+        }
+    }
+    addOperatorListeners() {
+        for (let y = 0; y < this.operator_buttons.length; y++) {
+            this.operator_buttons[y].addEventListener('click', (e) => {
+                this.handleOperatorClick(this.operator_buttons[y].innerHTML);
+            });
+        }
+    }
+
+    handleNumberClick(number) {
+        this.current_input.push(number);
+        this.updateDisplay();
+    }
+    handleOperatorClick(operator) {
+        this.current_input.push(operator);
+        this.updateDisplay();
+    }
+    updateDisplay() {
+        this.input_field.innerHTML = this.current_input.join('');
+    }
+    clearDisplay() {
+        this.input_field.innerHTML = "";
+        this.current_input = [];
+    }
+
 }
-for (let y = 0; y < operator_buttons.length; y++) {
-    operator_buttons[y].addEventListener('click', (e) => {
-        current_input.push(operator_buttons[y].innerHTML);
-    });
-}
 
-  
+const calculator = new Calculator();
 
