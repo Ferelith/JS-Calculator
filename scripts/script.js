@@ -27,8 +27,12 @@ class Calculator {
     }
 
     handleNumberClick(number) {
-        this.current_input.push(number);
-        this.updateDisplay();
+        if (number === 'C') {
+            this.clearDisplay();
+        } else {
+            this.current_input.push(number);
+            this.updateDisplay();
+        }
     }
     handleOperatorClick(operator) {
         this.current_input.push(operator);
