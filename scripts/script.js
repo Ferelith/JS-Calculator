@@ -5,7 +5,7 @@ class Calculator {
         this.operator_buttons = document.querySelectorAll('.operator_buttons div');
         this.clear_button = document.getElementById('clear_button');
         this.equals_button = document.getElementById('result');
-        this.input_field = document.getElementById('input_field');
+        this.input_field = document.getElementById('input_current');
         this.decimal_point = document.getElementById('decimal_point');
 
         // Stores the input for calculation
