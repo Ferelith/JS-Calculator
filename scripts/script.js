@@ -53,9 +53,13 @@ class Calculator {
     handleNumberClick(number) {
         this.input_field.innerHTML += number; // Directly append the number to the input field
     }
-    handleOperatorClick(operator) { // Handles the operator click event
+    handleOperatorClick(operator) { // Handles the operator click event 
+        // TODO: Allow negative numbers at the start
         if (this.input_field.innerHTML === "") {
-            return; 
+            if (operator === '−') {
+                this.input_field.innerHTML += '-'; // Handle the minus operator
+            }
+            return;
         }
         this.current_calc_input.push(this.input_field.innerHTML);
         this.current_calc_input.push(operator);
