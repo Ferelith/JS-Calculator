@@ -105,7 +105,10 @@ class Calculator {
         if (this.input_field.innerHTML.includes('.')) {
             return; // Prevent adding multiple decimal points
         }
-        this.input_field.innerHTML += '0.'; // Append decimal point to the input field
+        if (this.input_field.innerHTML === "") {
+            this.input_field.innerHTML = '0'; // Start with '0' if the input field is empty
+        }
+        this.input_field.innerHTML += '.'; // Append decimal point to the input field
     }
     handleEqualsClick() {
         if (this.input_field.innerHTML === "") {
