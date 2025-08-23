@@ -6,11 +6,12 @@ class Calculator {
         this.clear_button = document.getElementById('clear_button');
         this.equals_button = document.getElementById('result');
         this.input_field = document.getElementById('input_current');
+        this.input_history = document.getElementById('input_history');
         this.decimal_point = document.getElementById('decimal_point');
 
         // Stores the input for calculation
         this.current_calc_input = [];
-        
+
         this.addKeyboardSupport();
         this.addNumberListeners();
         this.addOperatorListeners();
@@ -99,10 +100,6 @@ class Calculator {
         this.current_calc_input.push(this.input_field.innerHTML);
         this.current_calc_input.push(operator);
         this.input_field.innerHTML = "";
-
-
-        console.log(this.current_calc_input);
-
     }
     handleDecimalPointClick() {
         if (this.input_field.innerHTML.includes('.')) {
@@ -116,6 +113,7 @@ class Calculator {
         }
         this.current_calc_input.push(this.input_field.innerHTML);
         const result = this.calculateResult(this.current_calc_input);
+        this.updateCalculationHistory(this.current_calc_input);
         this.clearInput();
         this.input_field.innerHTML = result;
     }
@@ -150,6 +148,12 @@ class Calculator {
     updateDisplay() {
         this.input_field.innerHTML = this.current_calc_input.join('');
     }
+    updateCalculationHistory(currentCalculations) {
+        // Display the calculation history
+        let historyString = currentCalculations.join(' ') + ' =';
+        this.input_history.innerHTML = historyString;
+    }
+
     clearInput() {
         this.current_calc_input = [];
         this.clearDisplay();
@@ -157,7 +161,6 @@ class Calculator {
     clearDisplay() {
         this.input_field.innerHTML = "";
     }
-
 }
 
 const calculator = new Calculator();
