@@ -10,7 +10,8 @@ class Calculator {
 
         // Stores the input for calculation
         this.current_calc_input = [];
-
+        
+        this.addKeyboardSupport();
         this.addNumberListeners();
         this.addOperatorListeners();
         this.addEqualsButtonListener();
@@ -47,6 +48,40 @@ class Calculator {
     addEqualsButtonListener() {
         this.equals_button.addEventListener('click', () => {
             this.handleEqualsClick();
+        });
+    }
+    addKeyboardSupport() {
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if (!isNaN(key)) {
+                this.handleNumberClick(key);
+            } else {
+                switch (key) {
+                    case '+':
+                        this.handleOperatorClick(key);
+                        break;
+                    case '-':
+                        this.handleOperatorClick('−');
+                        break;  
+                    case '*':
+                        this.handleOperatorClick('×');
+                        break;
+                    case '/':
+                        this.handleOperatorClick('÷');
+                        break;
+                    case 'Enter':
+                        this.handleEqualsClick();
+                        break;
+                    case 'Backspace':
+                        this.clearInput();
+                        break;
+                    case '.':
+                        this.handleDecimalPointClick();
+                        break;
+                    default:
+                        break;
+                }
+            }
         });
     }
 
