@@ -90,7 +90,6 @@ class Calculator {
         this.input_field.innerHTML += number; // Directly append the number to the input field
     }
     handleOperatorClick(operator) { // Handles the operator click event 
-        // TODO: Allow negative numbers at the start
         if (this.input_field.innerHTML === "") {
             if (operator === '−') {
                 this.input_field.innerHTML += '-'; // Handle the minus operator
@@ -110,6 +109,7 @@ class Calculator {
         }
         this.input_field.innerHTML += '.'; // Append decimal point to the input field
     }
+    // TODO: Use UpdateCalculationHistory to update every time an operator or number is clicked
     handleEqualsClick() {
         if (this.input_field.innerHTML === "") {
             return; 
