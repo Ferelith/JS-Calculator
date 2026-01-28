@@ -120,6 +120,7 @@ class Calculator {
         this.clearInput();
         this.input_field.innerHTML = result;
     }
+    // TODO: Improve calculateResult to handle operator precedence
     calculateResult(calc_input) {
         let result = parseFloat(calc_input[0]);
         for (let i = 1; i < calc_input.length; i += 2) {
