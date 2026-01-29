@@ -10,7 +10,10 @@ class Calculator {
         this.decimal_point = document.getElementById('decimal_point');
 
         this.current_calc_input = [];
+        this.justEvaluated = false;
+        this.errorState = false;
 
+        this.addAccessibilityAttributes();
         this.addKeyboardSupport();
         this.addNumberListeners();
         this.addOperatorListeners();
@@ -20,23 +23,55 @@ class Calculator {
 
     }
 
+    addAccessibilityAttributes() {
+        const labelMap = new Map([
+            ['+', 'Add'],
+            ['−', 'Subtract'],
+            ['×', 'Multiply'],
+            ['÷', 'Divide'],
+            ['.', 'Decimal point'],
+            ['C', 'Clear'],
+            ['=', 'Equals'],
+        ]);
+        const allButtons = [
+            ...this.number_buttons,
+            ...this.operator_buttons,
+            this.decimal_point,
+            this.clear_button,
+            this.equals_button,
+        ];
+        allButtons.forEach((button) => {
+            if (!button) return;
+            const text = button.textContent.trim();
+            button.setAttribute('role', 'button');
+            button.setAttribute('tabindex', '0');
+            button.setAttribute('aria-label', labelMap.get(text) || text);
+            button.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    button.click();
+                }
+            });
+        });
+    }
+
     addNumberListeners() {
         for (let i = 0; i < this.number_buttons.length; i++) {
             this.number_buttons[i].addEventListener('click', (e) => {
-                this.handleNumberClick(this.number_buttons[i].innerHTML);
+                this.handleNumberClick(this.number_buttons[i].textContent);
             });
         }
     }
     addOperatorListeners() {
         for (let y = 0; y < this.operator_buttons.length; y++) {
             this.operator_buttons[y].addEventListener('click', (e) => {
-                this.handleOperatorClick(this.operator_buttons[y].innerHTML);
+                this.handleOperatorClick(this.operator_buttons[y].textContent);
             });
         }
     }
     addClearButtonListener() {
         this.clear_button.addEventListener('click', () => {
-            this.clearInput();
+            this.clearAll();
         });
     }
     addDecimalPointListener() {
@@ -73,7 +108,10 @@ class Calculator {
                         this.handleEqualsClick();
                         break;
                     case 'Backspace':
-                        this.clearInput();
+                        this.handleBackspace();
+                        break;
+                    case 'Escape':
+                        this.clearAll();
                         break;
                     case '.':
                         this.handleDecimalPointClick();
@@ -85,81 +123,190 @@ class Calculator {
         });
     }
 
+    getCurrentValue() {
+        return this.input_field.textContent;
+    }
+
+    setCurrentValue(value) {
+        this.input_field.textContent = value;
+    }
+
+    setHistoryValue(value) {
+        this.input_history.textContent = value;
+    }
+
+    renderHistoryPreview() {
+        const current = this.getCurrentValue();
+        const tokens = [...this.current_calc_input];
+        if (current !== "") {
+            tokens.push(current);
+        }
+        this.setHistoryValue(tokens.join(' '));
+    }
+
     handleNumberClick(number) {
-        this.input_field.innerHTML += number;
+        if (this.errorState) {
+            this.clearAll();
+        }
+        if (this.justEvaluated) {
+            this.current_calc_input = [];
+            this.setHistoryValue('');
+            this.setCurrentValue('');
+            this.justEvaluated = false;
+        }
+        const current = this.getCurrentValue();
+        if (current === "0") {
+            this.setCurrentValue(number);
+        } else if (current === "-0") {
+            this.setCurrentValue(`-${number}`);
+        } else {
+            this.setCurrentValue(current + number);
+        }
+        this.renderHistoryPreview();
     }
     handleOperatorClick(operator) {
-        if (this.input_field.innerHTML === "") {
-            if (operator === '−') {
-                this.input_field.innerHTML += '-';
+        if (this.errorState) {
+            return;
+        }
+        const current = this.getCurrentValue();
+        if (current === "") {
+            if (this.current_calc_input.length === 0 && operator === '−') {
+                this.setCurrentValue('-');
+                this.renderHistoryPreview();
+                return;
+            }
+            const lastIndex = this.current_calc_input.length - 1;
+            if (lastIndex >= 0) {
+                this.current_calc_input[lastIndex] = operator;
+                this.renderHistoryPreview();
             }
             return;
         }
-        this.current_calc_input.push(this.input_field.innerHTML);
-        this.current_calc_input.push(operator);
-        this.input_field.innerHTML = "";
-    }
-    handleDecimalPointClick() {
-        if (this.input_field.innerHTML.includes('.')) {
+        if (current === "-" || current === ".") {
             return;
         }
-        if (this.input_field.innerHTML === "") {
-            this.input_field.innerHTML = '0';
+        this.current_calc_input.push(current);
+        this.current_calc_input.push(operator);
+        this.setCurrentValue("");
+        this.justEvaluated = false;
+        this.renderHistoryPreview();
+    }
+    handleDecimalPointClick() {
+        if (this.errorState) {
+            this.clearAll();
         }
-        this.input_field.innerHTML += '.';
+        if (this.justEvaluated) {
+            this.current_calc_input = [];
+            this.setHistoryValue('');
+            this.setCurrentValue('');
+            this.justEvaluated = false;
+        }
+        const current = this.getCurrentValue();
+        if (current.includes('.')) {
+            return;
+        }
+        if (current === "") {
+            this.setCurrentValue('0');
+        } else if (current === "-") {
+            this.setCurrentValue('-0');
+        }
+        this.setCurrentValue(this.getCurrentValue() + '.');
+        this.renderHistoryPreview();
     }
     handleEqualsClick() {
-        if (this.input_field.innerHTML === "") {
+        if (this.errorState) {
+            return;
+        }
+        const current = this.getCurrentValue();
+        if (current === "" || current === "-" || current === ".") {
             return; 
         }
-        this.current_calc_input.push(this.input_field.innerHTML);
+        this.current_calc_input.push(current);
+        const expression = this.current_calc_input.join(' ');
         const result = this.calculateResult(this.current_calc_input);
-        this.updateCalculationHistory(this.current_calc_input);
-        this.clearInput();
-        this.input_field.innerHTML = result;
+        if (result === "Error") {
+            this.setHistoryValue(`${expression} = Error`);
+            this.setCurrentValue("Error");
+            this.errorState = true;
+            this.current_calc_input = [];
+            return;
+        }
+        this.setHistoryValue(`${expression} = ${result}`);
+        this.current_calc_input = [];
+        this.setCurrentValue(String(result));
+        this.justEvaluated = true;
     }
     calculateResult(calc_input) {
-        let result = parseFloat(calc_input[0]);
-        for (let i = 1; i < calc_input.length; i += 2) {
-            const operator = calc_input[i];
-            const nextNumber = parseFloat(calc_input[i + 1]);
-            switch (operator) {
-                case '+':
-                    result += nextNumber;
-                    break;
-                case '−':
-                    result -= nextNumber;
-                    break;
-                case '×':
-                    result *= nextNumber;
-                    break;
-                case '÷':
+        const tokens = [...calc_input];
+        if (tokens.length === 0) {
+            return "Error";
+        }
+        const collapsed = [parseFloat(tokens[0])];
+        for (let i = 1; i < tokens.length; i += 2) {
+            const operator = tokens[i];
+            const nextNumber = parseFloat(tokens[i + 1]);
+            if (Number.isNaN(nextNumber)) {
+                return "Error";
+            }
+            if (operator === '×' || operator === '÷') {
+                const lastIndex = collapsed.length - 1;
+                const current = collapsed[lastIndex];
+                if (operator === '×') {
+                    collapsed[lastIndex] = current * nextNumber;
+                } else {
                     if (nextNumber === 0) {
                         return "Error";
                     }
-                    result /= nextNumber;
-                    break;
-                default:
-                    console.log(`Unknown operator: ${operator}`);
-                    return "Error";
+                    collapsed[lastIndex] = current / nextNumber;
+                }
+            } else if (operator === '+' || operator === '−') {
+                collapsed.push(operator, nextNumber);
+            } else {
+                console.log(`Unknown operator: ${operator}`);
+                return "Error";
+            }
+        }
+        let result = parseFloat(collapsed[0]);
+        for (let i = 1; i < collapsed.length; i += 2) {
+            const operator = collapsed[i];
+            const nextNumber = parseFloat(collapsed[i + 1]);
+            if (operator === '+') {
+                result += nextNumber;
+            } else if (operator === '−') {
+                result -= nextNumber;
+            } else {
+                console.log(`Unknown operator: ${operator}`);
+                return "Error";
             }
         }
         return result;
     }
-    updateDisplay() {
-        this.input_field.innerHTML = this.current_calc_input.join('');
-    }
-    updateCalculationHistory(currentCalculations) {
-        let historyString = currentCalculations.join(' ') + ' =';
-        this.input_history.innerHTML = historyString;
+
+    handleBackspace() {
+        if (this.errorState) {
+            this.clearAll();
+            return;
+        }
+        const current = this.getCurrentValue();
+        if (current !== "") {
+            this.setCurrentValue(current.slice(0, -1));
+            this.renderHistoryPreview();
+            return;
+        }
+        if (this.current_calc_input.length >= 2) {
+            this.current_calc_input.pop();
+            const previousNumber = this.current_calc_input.pop();
+            this.setCurrentValue(previousNumber || "");
+            this.renderHistoryPreview();
+        }
     }
 
-    clearInput() {
+    clearAll() {
         this.current_calc_input = [];
-        this.clearDisplay();
-    }
-    clearDisplay() {
-        this.input_field.innerHTML = "";
+        this.setHistoryValue("");
+        this.setCurrentValue("");
+        this.justEvaluated = false;
+        this.errorState = false;
     }
 }
 
