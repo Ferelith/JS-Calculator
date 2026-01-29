@@ -9,7 +9,6 @@ class Calculator {
         this.input_history = document.getElementById('input_history');
         this.decimal_point = document.getElementById('decimal_point');
 
-        // Stores the input for calculation
         this.current_calc_input = [];
 
         this.addKeyboardSupport();
@@ -87,12 +86,12 @@ class Calculator {
     }
 
     handleNumberClick(number) {
-        this.input_field.innerHTML += number; // Directly append the number to the input field
+        this.input_field.innerHTML += number;
     }
-    handleOperatorClick(operator) { // Handles the operator click event 
+    handleOperatorClick(operator) {
         if (this.input_field.innerHTML === "") {
             if (operator === '−') {
-                this.input_field.innerHTML += '-'; // Handle the minus operator
+                this.input_field.innerHTML += '-';
             }
             return;
         }
@@ -102,14 +101,13 @@ class Calculator {
     }
     handleDecimalPointClick() {
         if (this.input_field.innerHTML.includes('.')) {
-            return; // Prevent adding multiple decimal points
+            return;
         }
         if (this.input_field.innerHTML === "") {
-            this.input_field.innerHTML = '0'; // Start with '0' if the input field is empty
+            this.input_field.innerHTML = '0';
         }
-        this.input_field.innerHTML += '.'; // Append decimal point to the input field
+        this.input_field.innerHTML += '.';
     }
-    // TODO: Use UpdateCalculationHistory to update every time an operator or number is clicked
     handleEqualsClick() {
         if (this.input_field.innerHTML === "") {
             return; 
@@ -120,7 +118,6 @@ class Calculator {
         this.clearInput();
         this.input_field.innerHTML = result;
     }
-    // TODO: Improve calculateResult to handle operator precedence
     calculateResult(calc_input) {
         let result = parseFloat(calc_input[0]);
         for (let i = 1; i < calc_input.length; i += 2) {
@@ -138,13 +135,13 @@ class Calculator {
                     break;
                 case '÷':
                     if (nextNumber === 0) {
-                        return "Error"; // Handle division by zero
+                        return "Error";
                     }
                     result /= nextNumber;
                     break;
                 default:
                     console.log(`Unknown operator: ${operator}`);
-                    return "Error"; // Handle unknown operator
+                    return "Error";
             }
         }
         return result;
@@ -153,7 +150,6 @@ class Calculator {
         this.input_field.innerHTML = this.current_calc_input.join('');
     }
     updateCalculationHistory(currentCalculations) {
-        // Display the calculation history
         let historyString = currentCalculations.join(' ') + ' =';
         this.input_history.innerHTML = historyString;
     }
@@ -168,4 +164,3 @@ class Calculator {
 }
 
 const calculator = new Calculator();
-
