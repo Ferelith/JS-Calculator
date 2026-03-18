@@ -15,8 +15,8 @@ class Calculator {
 
         this.addAccessibilityAttributes();
         this.addKeyboardSupport();
-        this.addNumberListeners();
-        this.addOperatorListeners();
+        this.addClickListeners(this.number_buttons, this.handleNumberClick);
+        this.addClickListeners(this.operator_buttons, this.handleOperatorClick);
         this.addEqualsButtonListener();
         this.addClearButtonListener();
         this.addDecimalPointListener();
@@ -24,6 +24,7 @@ class Calculator {
     }
 
     addAccessibilityAttributes() {
+        // Map button text to more descriptive ARIA labels
         const labelMap = new Map([
             ['+', 'Add'],
             ['−', 'Subtract'],
@@ -33,6 +34,7 @@ class Calculator {
             ['C', 'Clear'],
             ['=', 'Equals'],
         ]);
+        // Select all buttons
         const allButtons = [
             ...this.number_buttons,
             ...this.operator_buttons,
@@ -40,6 +42,7 @@ class Calculator {
             this.clear_button,
             this.equals_button,
         ];
+        // Add ARIA attributes to each button
         allButtons.forEach((button) => {
             if (!button) return;
             const text = button.textContent.trim();
@@ -47,28 +50,21 @@ class Calculator {
             button.setAttribute('tabindex', '0');
             button.setAttribute('aria-label', labelMap.get(text) || text);
             button.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (e.key === 'Enter' || e.key === ' ') { 
                     e.preventDefault();
                     button.click();
                 }
             });
         });
     }
-
-    addNumberListeners() {
-        for (let i = 0; i < this.number_buttons.length; i++) {
-            this.number_buttons[i].addEventListener('click', (e) => {
-                this.handleNumberClick(this.number_buttons[i].textContent);
+    addClickListeners(buttons, handler) {
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                handler.call(this, button.textContent.trim());
             });
-        }
+        });
     }
-    addOperatorListeners() {
-        for (let y = 0; y < this.operator_buttons.length; y++) {
-            this.operator_buttons[y].addEventListener('click', (e) => {
-                this.handleOperatorClick(this.operator_buttons[y].textContent);
-            });
-        }
-    }
+    
     addClearButtonListener() {
         this.clear_button.addEventListener('click', () => {
             this.clearAll();
@@ -148,11 +144,8 @@ class Calculator {
         if (this.errorState) {
             this.clearAll();
         }
-        if (this.justEvaluated) {
-            this.current_calc_input = [];
-            this.setHistoryValue('');
-            this.setCurrentValue('');
-            this.justEvaluated = false;
+        if (this.justEvaluated) { 
+            this.justEvaluatedFlagOff();
         }
         const current = this.getCurrentValue();
         if (current === "0") {
@@ -164,7 +157,7 @@ class Calculator {
         }
         this.renderHistoryPreview();
     }
-    handleOperatorClick(operator) {
+    handleOperatorClick(operator) { //TODO: Add code labels to identify what each block does and whether it requires a helper function.
         if (this.errorState) {
             return;
         }
@@ -196,10 +189,7 @@ class Calculator {
             this.clearAll();
         }
         if (this.justEvaluated) {
-            this.current_calc_input = [];
-            this.setHistoryValue('');
-            this.setCurrentValue('');
-            this.justEvaluated = false;
+            this.justEvaluatedFlagOff();
         }
         const current = this.getCurrentValue();
         if (current.includes('.')) {
@@ -307,6 +297,12 @@ class Calculator {
         this.setCurrentValue("");
         this.justEvaluated = false;
         this.errorState = false;
+    }
+    justEvaluatedFlagOff() {
+        this.current_calc_input = [];
+        this.setHistoryValue('');
+        this.setCurrentValue('');
+        this.justEvaluated = false;
     }
 }
 
