@@ -66,7 +66,7 @@ class Calculator {
                         break;
                     case '-':
                         this.handleOperatorClick('−');
-                        break;  
+                        break;
                     case '*':
                         this.handleOperatorClick('×');
                         break;
@@ -117,7 +117,7 @@ class Calculator {
     // Equals button handling and calculation
     handleEqualsClick() {
         if (this.input_field.innerHTML === "") {
-            return; 
+            return;
         }
         this.current_calc_input.push(this.input_field.innerHTML);
         const result = this.calculateResult(this.current_calc_input);

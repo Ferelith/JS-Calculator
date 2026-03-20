@@ -50,7 +50,7 @@ class Calculator {
             button.setAttribute('tabindex', '0');
             button.setAttribute('aria-label', labelMap.get(text) || text);
             button.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') { 
+                if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     button.click();
                 }
@@ -64,7 +64,7 @@ class Calculator {
             });
         });
     }
-    
+
     addClearButtonListener() {
         this.clear_button.addEventListener('click', () => {
             this.clearAll();
@@ -84,7 +84,7 @@ class Calculator {
     addKeyboardSupport() {
         document.addEventListener('keydown', (e) => {
             const key = e.key;
-            if (!isNaN(key)) {
+            if (/^\d$/.test(key)) {
                 this.handleNumberClick(key);
             } else {
                 switch (key) {
@@ -93,7 +93,7 @@ class Calculator {
                         break;
                     case '-':
                         this.handleOperatorClick('−');
-                        break;  
+                        break;
                     case '*':
                         this.handleOperatorClick('×');
                         break;
@@ -144,7 +144,7 @@ class Calculator {
         if (this.errorState) {
             this.clearAll();
         }
-        if (this.justEvaluated) { 
+        if (this.justEvaluated) {
             this.justEvaluatedFlagOff();
         }
         const current = this.getCurrentValue();
@@ -158,28 +158,30 @@ class Calculator {
         this.renderHistoryPreview();
     }
     handleOperatorClick(operator) { //TODO: Add code labels to identify what each block does and whether it requires a helper function.
-        if (this.errorState) {
+        if (this.errorState) { // Stop interaction in error mode
             return;
         }
         const current = this.getCurrentValue();
-        if (current === "") {
-            if (this.current_calc_input.length === 0 && operator === '−') {
+        if (current === "") { // Decide what to do if current input is empty
+            if (this.current_calc_input.length === 0 && operator === '−') { // Allow negative number start
                 this.setCurrentValue('-');
                 this.renderHistoryPreview();
                 return;
             }
             const lastIndex = this.current_calc_input.length - 1;
             if (lastIndex >= 0) {
-                this.current_calc_input[lastIndex] = operator;
+                this.current_calc_input[lastIndex] = operator; // Replace last operator
                 this.renderHistoryPreview();
             }
             return;
         }
-        if (current === "-" || current === ".") {
+        const validCurrentInputPattern = /^-?\d+(?:\.\d+)?$/;
+        if (!validCurrentInputPattern.test(current)) {
             return;
         }
-        this.current_calc_input.push(current);
-        this.current_calc_input.push(operator);
+
+        this.current_calc_input.push(current); // Store number
+        this.current_calc_input.push(operator); // Store operator
         this.setCurrentValue("");
         this.justEvaluated = false;
         this.renderHistoryPreview();
@@ -209,7 +211,7 @@ class Calculator {
         }
         const current = this.getCurrentValue();
         if (current === "" || current === "-" || current === ".") {
-            return; 
+            return;
         }
         this.current_calc_input.push(current);
         const expression = this.current_calc_input.join(' ');
