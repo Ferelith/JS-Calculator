@@ -157,11 +157,9 @@ class Calculator {
         }
         this.renderHistoryPreview();
     }
-    handleOperatorClick(operator) { //TODO: Add code labels to identify what each block does and whether it requires a helper function.
-        if (this.errorState) { // Stop interaction in error mode
-            return;
-        }
-        const current = this.getCurrentValue();
+    handleOperatorClick(operator) { // TODO: Try and find a way to split this function as it does too many things.
+        if (this.detectErrorState()) { return; } // Stop if error sate is detected.
+        const current = this.getCurrentValue(); 
         if (current === "") { // Decide what to do if current input is empty
             if (this.current_calc_input.length === 0 && operator === '−') { // Allow negative number start
                 this.setCurrentValue('-');
@@ -175,7 +173,7 @@ class Calculator {
             }
             return;
         }
-        const validCurrentInputPattern = /^-?\d+(?:\.\d+)?$/;
+        const validCurrentInputPattern = /^-?\d+(?:\.\d+)?$/; // Check for valid number input (allowing for negative and decimal numbers)
         if (!validCurrentInputPattern.test(current)) {
             return;
         }
@@ -185,6 +183,9 @@ class Calculator {
         this.setCurrentValue("");
         this.justEvaluated = false;
         this.renderHistoryPreview();
+    }
+    detectErrorState() {
+        return this.errorState;
     }
     handleDecimalPointClick() {
         if (this.errorState) {
