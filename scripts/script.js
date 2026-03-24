@@ -158,7 +158,7 @@ class Calculator {
         this.renderHistoryPreview();
     }
     handleOperatorClick(operator) { // TODO: Try and find a way to split this function as it does too many things.
-        if (this.detectErrorState()) { return; } // Stop if error sate is detected.
+        if (this.isErrorState()) { return; } // Stop if error sate is detected.
         const current = this.getCurrentValue(); 
         if (current === "") { // Decide what to do if current input is empty
             if (this.current_calc_input.length === 0 && operator === '−') { // Allow negative number start
@@ -184,7 +184,7 @@ class Calculator {
         this.justEvaluated = false;
         this.renderHistoryPreview();
     }
-    detectErrorState() {
+    isErrorState() {
         return this.errorState;
     }
     handleDecimalPointClick() {
