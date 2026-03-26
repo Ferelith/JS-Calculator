@@ -81,7 +81,7 @@ class Calculator {
             this.handleEqualsClick();
         });
     }
-    addKeyboardSupport() {
+    addKeyboardSupport() { // TODO: Ensure that the keys do not remain focused after being pressed, as this can cause issues with subsequent key presses.
         document.addEventListener('keydown', (e) => {
             const key = e.key;
             if (/^\d$/.test(key)) {
@@ -157,7 +157,7 @@ class Calculator {
         }
         this.renderHistoryPreview();
     }
-    handleOperatorClick(operator) { // TODO: Try and find a way to split this function as it does too many things.
+    handleOperatorClick(operator) { 
         if (this.isErrorState()) { return; } // Stop if error sate is detected.
         const current = this.getCurrentValue(); 
         if (current === "") { // Decide what to do if current input is empty
